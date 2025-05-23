@@ -111,6 +111,47 @@ def rebase_data(data, query):
     return rebase_data
 
 
+# URL 로부터 댓글을 수집하는 함수
+def extract_comments_from_url(driver, url):
+    print(f"기사 접속 : {url}")
+    driver.get(url)
+    time.sleep(1)
+
+    # 1. 댓글 보기 버튼 클릭
+    try:
+        comment_btn = driver.find_element(By.CLASS_NAME, 'simplecmt_link_text')
+        comment_btn.click()
+        time.sleep(1)
+    except:
+        print("댓글 보기 버튼 없음\n")
+        return []
+    
+    # 2. 댓글 보기 버튼을 누른 뒤 더보기 버튼 반복하기
+    while True:
+        try:
+            more_btn = driver.find_element(By.CLASS_NAME, 'u_cbox_page_more')
+            more_btn.click()
+            time.sleep(0.5)
+        except:
+            break
+    
+    # 3. 모든 댓글 수집하기
+    comments = []
+    try:
+        comment_element = driver.find_elements(By.CLASS_NAME, 'u_cbox_contents')
+        for comment in comment_element:
+            comments.append(comment.text.strip())
+    except:
+        print("⚠️ 댓글 수집 중 오류 발생")
+
+    return comments
+
+
+
+
+
+
+
 
 
 
