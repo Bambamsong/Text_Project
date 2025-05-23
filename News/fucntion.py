@@ -167,7 +167,8 @@ def crawl_comments(news_dict):
                 for c in comments:
                     result.append(
                         {
-                            'platform' : platform,
+                            'platform' : 'news',
+                            'press' : platform,
                             'keyword' : keyword,
                             'comment' : c
                         }
