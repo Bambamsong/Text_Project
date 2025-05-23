@@ -1,6 +1,10 @@
 import re
+import requests
+import json
+import html
 
-
+import time
+from selenium.webdriver.common.by import By
 platform_list = {
     "001": "연합뉴스",
     "005": "국민일보",
@@ -63,3 +67,50 @@ platform_list = {
 def remove_tag(my_str):
     p = re.compile('(<([^>]+)>)')
     return p.sub('', my_str)
+
+
+# 네이버 API 요청 코드
+def get_naver_news(url, headers):
+    response = requests.get(url, headers=headers)
+
+    if response.status_code == 200:
+        data = response.json()
+        print(json.dumps(data['items'], indent=2,  ensure_ascii=False)) # 터미널로그상 json 구조를 명확히 보기 위한 코드
+    else:
+        print('API 요청 실패', response.status_code)
+    
+    data = data['items']
+
+    return data
+
+
+# DATA 재구성 함수 (링크, 방송사, 게재일시, 검색 키워드)
+def rebase_data(data, query):
+    rebase_data = dict()
+    i = 0
+
+    for news in data:
+        link = html.unescape(news['link'])
+        pubdate = news['pubDate']
+
+        if 'n.news.naver.com' in link:
+            rebase_data[i] = dict()
+            rebase_data[i]['link'] = link
+            match = re.search(r'article/(\d+)', link)
+            if match:
+                press_code = match.group(1)
+                press_name = platform_list.get(press_code, '기타')
+            else:
+                press_name = '기타'
+            rebase_data[i]['platform'] = press_name
+            rebase_data[i]['pubdate'] = pubdate
+            rebase_data[i]['keyword'] = query
+
+        i += 1
+    
+    return rebase_data
+
+
+
+
+
