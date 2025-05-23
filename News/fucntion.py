@@ -5,6 +5,7 @@ import html
 
 import time
 from selenium.webdriver.common.by import By
+from selenium import webdriver
 platform_list = {
     "001": "연합뉴스",
     "005": "국민일보",
@@ -145,6 +146,41 @@ def extract_comments_from_url(driver, url):
         print("⚠️ 댓글 수집 중 오류 발생")
 
     return comments
+
+
+# 크롤링 함수(링크로부터 댓글 수집)
+def crawl_comments(news_dict):
+    driver = webdriver.Chrome()
+
+    result = []
+
+    for article in news_dict.values():
+        url = html.unescape(article['link'])
+        platform = article['platform']
+        keyword = article['keyword']
+
+        print(f"[{platform}] : 기사 접속 중 ")
+
+        try:
+            comments = extract_comments_from_url(driver, url)
+            if comments:
+                for c in comments:
+                    result.append(
+                        {
+                            'platform' : platform,
+                            'keyword' : keyword,
+                            'comment' : c
+                        }
+                    )
+                print(f"댓글 {len(result)}개 수집 완료")
+            else:
+                print("댓글 없음")
+        except:
+            print("크롤링 에러")
+        
+    driver.quit()
+    return result
+
 
 
 
