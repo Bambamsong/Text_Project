@@ -13,7 +13,7 @@ client_secret = os.getenv('NAVER_PW')
 # API 형식
 base_url = 'https://openapi.naver.com/v1/search/news.json'
 query = ['이재명', '김문수', '이준석']
-n_display = 10
+n_display = 50
 start = 1
 sort = 'sim'
 
