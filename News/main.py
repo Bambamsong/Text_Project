@@ -13,7 +13,7 @@ client_secret = os.getenv('NAVER_PW')
 # API 형식
 base_url = 'https://openapi.naver.com/v1/search/news.json'
 query = ['이재명', '김문수', '이준석']
-n_display = 50
+n_display = 1
 start = 1
 sort = 'sim'
 
@@ -21,6 +21,7 @@ headers = {
     'X-Naver-Client-Id': client_id,
     'X-Naver-Client-Secret': client_secret
 }
+
 
 
 df_all = pd.DataFrame()
@@ -39,4 +40,12 @@ for i in query:
     df_all = pd.concat([df_all,df_result], ignore_index=True)
 
     
-df_all.to_csv('news_comments.csv', index=False)
+# 1. 저장 경로 구성 (상대 경로)
+save_path = os.path.join(os.path.dirname(__file__), '..', 'DATA', 'news_comments.csv')
+
+# 2. 상위 폴더가 존재하지 않으면 생성 (안전장치)
+os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+# 3. CSV로 저장
+df_all.to_csv(save_path, index=False, encoding='utf-8-sig')
+
