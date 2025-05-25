@@ -116,7 +116,7 @@ def rebase_data(data, query):
 def extract_comments_from_url(driver, url):
     print(f"기사 접속 : {url}")
     driver.get(url)
-    time.sleep(1)
+    time.sleep(2)
 
     # 1. 댓글 보기 버튼 클릭
     try:
@@ -132,7 +132,7 @@ def extract_comments_from_url(driver, url):
         try:
             more_btn = driver.find_element(By.CLASS_NAME, 'u_cbox_page_more')
             more_btn.click()
-            time.sleep(0.5)
+            time.sleep(1)
         except:
             break
     
@@ -160,7 +160,7 @@ def crawl_comments(news_dict):
         keyword = article['keyword']
 
         print(f"[{platform}] : 기사 접속 중 ")
-
+        i = 0
         try:
             comments = extract_comments_from_url(driver, url)
             if comments:
@@ -173,13 +173,15 @@ def crawl_comments(news_dict):
                             'comment' : c
                         }
                     )
-                print(f"댓글 {len(result)}개 수집 완료")
+                    i += 1
+                print(f"댓글 {i}개 수집 완료")
             else:
                 print("댓글 없음")
         except:
             print("크롤링 에러")
-        
     driver.quit()
+
+    print(f"총 : {len(result)}개 수집")
     return result
 
 
