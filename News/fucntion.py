@@ -76,7 +76,7 @@ def get_naver_news(url, headers):
 
     if response.status_code == 200:
         data = response.json()
-        print(json.dumps(data['items'], indent=2,  ensure_ascii=False)) # 터미널로그상 json 구조를 명확히 보기 위한 코드
+        # print(json.dumps(data['items'], indent=2,  ensure_ascii=False)) # 터미널로그상 json 구조를 명확히 보기 위한 코드
     else:
         print('API 요청 실패', response.status_code)
     
@@ -118,13 +118,29 @@ def extract_comments_from_url(driver, url):
     driver.get(url)
     time.sleep(1)
 
-    # 1. 댓글 보기 버튼 클릭
-    try:
-        comment_btn = driver.find_element(By.CLASS_NAME, 'simplecmt_link_text')
-        comment_btn.click()
-        time.sleep(1)
-    except:
-        print("댓글 보기 버튼 없음\n")
+    # # 1. 댓글 보기 버튼 클릭
+    # 댓글 보기 버튼 클래스 후보 리스트
+    possible_classes = [
+        'simplecmt_link_text',
+        'u_cbox_in_view_comment',
+        'u_cbox_ico_view_comment'
+
+    ]
+
+    # 1. 댓글 보기 버튼 찾기
+    comment_button_found = False
+    for cls in possible_classes:
+        try:
+            comment_btn = driver.find_element(By.CLASS_NAME, cls)
+            comment_btn.click()
+            comment_button_found = True
+            time.sleep(1.5)
+            break  # 성공했으니 루프 종료
+        except:
+            continue  # 다음 클래스명 시도
+    
+    if not comment_button_found:
+        print("❌ 댓글 보기 버튼 없음\n")
         return []
     
     # 2. 댓글 보기 버튼을 누른 뒤 더보기 버튼 반복하기
@@ -132,7 +148,7 @@ def extract_comments_from_url(driver, url):
         try:
             more_btn = driver.find_element(By.CLASS_NAME, 'u_cbox_page_more')
             more_btn.click()
-            time.sleep(0.5)
+            time.sleep(1)
         except:
             break
     
@@ -160,7 +176,7 @@ def crawl_comments(news_dict):
         keyword = article['keyword']
 
         print(f"[{platform}] : 기사 접속 중 ")
-
+        i = 0
         try:
             comments = extract_comments_from_url(driver, url)
             if comments:
@@ -173,13 +189,15 @@ def crawl_comments(news_dict):
                             'comment' : c
                         }
                     )
-                print(f"댓글 {len(result)}개 수집 완료")
+                    i += 1
+                print(f"댓글 {i}개 수집 완료")
             else:
                 print("댓글 없음")
         except:
             print("크롤링 에러")
-        
     driver.quit()
+
+    print(f"총 : {len(result)}개 수집")
     return result
 
 
