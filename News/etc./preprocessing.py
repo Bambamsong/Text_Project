@@ -55,7 +55,7 @@ def preprocess_korean(text, analyzer=kiwi, stopwords=stopwords):
     for sent in sents:
         tokens = analyzer.tokenize(sent.text)
         for token in tokens:
-            if token.tag.startswith('NNG') or token.tag.startswith('NNP'):
+            if token.tag.startswith('NNG') or token.tag.startswith('NNP') or token.tag.startswith('VV') or token.tag.startswith('VA'):
                 if (token.form, token.tag) not in stopwords:  # 수정된 부분
                     noun_result.append(token.form)
 
