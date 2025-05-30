@@ -1,51 +1,40 @@
 import os
-from dotenv import load_dotenv
-import urllib.parse
 import pandas as pd
+from dotenv import load_dotenv
 
-from fucntion import get_naver_news, rebase_data, extract_comments_from_url, crawl_comments
-load_dotenv()
+from crawl import fetch_news_items, crawl_comments_for
+from preprocess import preprocess_comments, generate_wordclouds
+from analyze import score_comments
 
-# API 이용 KEY
-client_id = os.getenv('NAVER_ID')
-client_secret = os.getenv('NAVER_PW')
+dict_path = 'data/SentiWord_info.json'
+def main():
+    load_dotenv()
+    client_id = os.getenv('NAVER_ID')
+    client_secret = os.getenv('NAVER_PW')
+    headers = {
+        'X-Naver-Client-Id': client_id,
+        'X-Naver-Client-Secret': client_secret
+    }
+    base_url = 'https://openapi.naver.com/v1/search/news.json'
+    queries = ['이재명', '김문수', '이준석']
+    all_comments = []
 
-# API 형식
-base_url = 'https://openapi.naver.com/v1/search/news.json'
-query = ['이재명', '김문수', '이준석']
-n_display = 50
-start = 1
-sort = 'sim'
+    for q in queries:
+        news_dict = fetch_news_items(q, base_url, headers)
+        comments = crawl_comments_for(news_dict)
+        all_comments.extend(comments)
 
-headers = {
-    'X-Naver-Client-Id': client_id,
-    'X-Naver-Client-Secret': client_secret
-}
+    df_comments = pd.DataFrame(all_comments)
+    df_comments.to_csv('output/raw_data/raw_news_comments.csv', index = False, encoding='utf-8-sig') # 파일 별도 저장
 
+    df_pre = preprocess_comments(df_comments)
+    senti_dict_path = os.path.join(os.getcwd(), 'data', 'SentiWord_info.json')
+    df_scored = score_comments(df_pre, senti_dict_path=senti_dict_path)
 
+    generate_wordclouds(df_pre, font_path='~/Library/Fonts/NanumGothic-Regular.ttf', out_dir='output/wordclouds')
 
-df_all = pd.DataFrame()
+    os.makedirs('data', exist_ok=True)
+    df_scored.to_csv('output/comments_score/news_comments_scored.csv', index=False, encoding='utf-8-sig')
 
-for i in query:
-    encQuery = urllib.parse.quote(i) # 한글이나 특수문자가 포함된 검색어(쿼리)를 URL에 안전하게 쓸 수 있도록 인코딩해주는 것
-    url = url = f'{base_url}?query={encQuery}&display={n_display}&start={start}&sort={sort}'
-    
-    news_data = get_naver_news(url, headers)
-
-    rebase_news_data = rebase_data(news_data, i)
-
-    result = crawl_comments(rebase_news_data)
-    df_result = pd.DataFrame(result)
-
-    df_all = pd.concat([df_all,df_result], ignore_index=True)
-
-    
-# 1. 저장 경로 구성 (상대 경로)
-save_path = os.path.join(os.path.dirname(__file__), '..', 'DATA', 'news_comments.csv')
-
-# 2. 상위 폴더가 존재하지 않으면 생성 (안전장치)
-os.makedirs(os.path.dirname(save_path), exist_ok=True)
-
-# 3. CSV로 저장
-df_all.to_csv(save_path, index=False, encoding='utf-8-sig')
-
+if __name__ == '__main__':
+    main()
