@@ -55,14 +55,15 @@ project-root/
 
 1. **의존성 설치**  
 프로젝트 루트에 `.env` 파일을 생성하고 아래 내용을 추가하세요.
+(프로젝트와 무관한 패키지들이 존재하여 가상환경을 만드시길 권장드립니다.)
    ```bash
    pip install -r requirements.txt
 
-2. **환경 변수 설정**
+3. **환경 변수 설정**
    ```bash
    NAVER_ID=your_client_id
    NAVER_PW=pour_client_secret
-3. **파이프라인 실행**
+4. **파이프라인 실행**
    ```bash
    python main.py
 
