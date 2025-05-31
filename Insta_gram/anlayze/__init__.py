@@ -1,1 +1,1 @@
-from .kiwi_module import KiwiNounExtractor, save_df_to_csv
+from .kiwi_module import KiwiNounExtractor, save_df_to_csv, KiwiNounAdjectiveExtractor
