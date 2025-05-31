@@ -3,7 +3,7 @@ import html
 import re
 from .utils import platform_list
 
-def fetch_news_items(query: str, base_url: str, headers: dict, n_display: int = 50, start: int = 1, sort: str = 'sim') -> dict:
+def fetch_news_items(query: str, base_url: str, headers: dict, n_display: int = 30, start: int = 1, sort: str = 'sim') -> dict:
     """네이버 API 호출 후 rebase_data를 통해 딕셔너리 형태로 반환"""
     enc_query = requests.utils.requote_uri(query)
     url = f"{base_url}?query={enc_query}&display={n_display}&start={start}&sort={sort}"
