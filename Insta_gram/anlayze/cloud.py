@@ -53,7 +53,6 @@ class WordCloudGenerator:
         plt.figure(figsize=(10, 5))
         plt.imshow(wc, interpolation='bilinear')
         plt.axis('off')
-        plt.title(f"WordCloud for '{keyword}'", fontsize=16)
         plt.tight_layout()
         plt.show()
 
