@@ -1,5 +1,6 @@
+
 import time
-from insta import InstagramCrawler
+from Insta_gram.crawl.insta import InstagramCrawler
 
 def main():
     sessionid = "YOUR_SESSION_ID"  # 본인의 sessionid 입력
