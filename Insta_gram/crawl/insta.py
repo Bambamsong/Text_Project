@@ -89,7 +89,7 @@ class InstagramCrawler:
                             next_btn.click()
                             time.sleep(2)
                         except:
-                            print("🚫 다음 게시물이 없습니다.")
+                            print("다음 게시물이 없습니다.")
                             break
 
                     except Exception as e:
@@ -107,7 +107,7 @@ class InstagramCrawler:
             writer = csv.DictWriter(f, fieldnames=["platform", "press", "keyword", "comment"])
             writer.writeheader()
             writer.writerows(self.results)
-        print(f"\n✅ CSV 저장 완료: {filename}")
+        print(f"\nCSV 저장 완료: {filename}")
 
     def quit(self):
         self.driver.quit()
